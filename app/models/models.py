@@ -27,6 +27,17 @@ class reactions_type(enum.Enum):
     REPORT = "report"
     SAVE = "save"
 
+class payment_status(enum.Enum):
+    PENDING = "pending"
+    COMPLETE = "complete"
+    FAILED = "failed"
+
+class payment_methods(enum.Enum):
+    CREDIT_CARD = "credit_card"
+    PAYPAL = "paypal"
+    STRIPE = "stripe"
+
+
 class User(db.Model):
     __tablename__:"users"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -34,7 +45,7 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(String(120),nullable= False,unique=True)
     password: Mapped[str] = mapped_column(String(150),nullable= False)
     user_type: Mapped[user_rol] = mapped_column(Enum(user_rol),nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean(),default=True)
+    is_active: Mapped[bool] = mapped_column(Boolean(),default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(),default= datetime.utcnow)
     last_login_at: Mapped[datetime] = mapped_column(DateTime(),nullable=False)
     avatar_url: Mapped[Optional[str]] = mapped_column(String(120))
@@ -46,6 +57,11 @@ class User(db.Model):
     user2_chat: Mapped[List["Chat"]] = relationship("Chat",foreign_keys="[Chat.user2]",back_populates="user2")
     user_sended_messages: Mapped[List["ChatMenssage"]] = relationship(back_populates="sender")
     user_comentaries: Mapped[List["Comentary"]] = relationship(back_populates="creator")
+    reactions: Mapped[List["Reaction"]] = relationship(back_populates="user")ç
+    user_favorites: Mapped[List["Favorite"]] = relationship(back_populates="user")
+    user_ratings: Mapped[List["Rating"]] = relationship(back_populates="user")
+    user_suscriptions: Mapped[List["Suscription"]] = relationship(back_populates="user")
+    user_payments: Mapped[List["Payment"]] = relationship(back_populates="user")
 
 
 class Product(db.Model):
@@ -61,6 +77,10 @@ class Product(db.Model):
     trend_analysis: Mapped[List["TrendAnalysis"]] = relationship(back_populates="product")
     data_source: Mapped[List["ProductDataSource"]] = relationship(back_populates="product")
     product_comentaries: Mapped[List["Comentary"]] = relationship(back_populates="product")
+    product_reactions: Mapped[List["Reaction"]] = relationship(back_populates="product")
+    product_images:[List["ProductImage"]] = relationship(back_populates="product")
+    product_favorites: [List["Favorite"]] = relationship(back_populates="product")
+    product_ratings: [List["Rating"]] = relationship(back_populates="product")
 
 
 class MarketCategory(db.Model):
@@ -165,4 +185,69 @@ class Reaction(db.Model):
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id"),nullable=False)
     type: Mapped[reactions_type] = mapped_column(Enum(reactions_type),nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(),default=datetime.utcnow)
+    user: Mapped["User"] = relationship(back_populates="reactions")
+    product: Mapped["Product"] = relationship(back_populates="product_reactions")
+
+class ProductImage(db.Model):
+    __tablename__:"product_images"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"),nullable=False)
+    url: Mapped[str] = mapped_column(String(120),nullable=False)
+    is_primary: Mapped[bool] = mapped_column(Boolean(),nullable=False)
+    upload_at: Mapped[datetime] = mapped_column(DateTime(),default=datetime.utcnow)
+    product: Mapped["Product"] = relationship(back_populates="product_images")
+
+
+class Favorite(db.Model):
+    __tablename__:"favorites"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"),nullable=False)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"),nullable=False)
+    saved_at: Mapped[datetime] = mapped_column(DateTime(),default=datetime.utcnow)
+    user: Mapped["User"] = relationship(back_populates="user_favorites")
+    product: Mapped["Product"] = relationship(back_populates="product_favorites")
+
+class Notification(db.Model):
+    __tablename__: "notifications"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"),nullable=False)
+    content: Mapped[str] = mapped_column(String(500),nullable=False)
+    is_read: Mapped[bool] = mapped_column(Boolean(),nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(),default=datetime.utcnow)
+
+class Rating(db.Model):
+    __tablename__:"ratings"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"),nullable=False)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"),nullable=False)
+    value: Mapped[int] = mapped_column(Numeric(1,0),nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(),default=datetime.utcnow)
+    user: Mapped["User"] = relationship(back_populates="user_ratings")
+    product: Mapped["Product"]  = relationship(back_populates="product_ratings")
+
+
+class Suscription(db.Model):
+    __tablename__:"suscriptions"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"),nullable=False)
+    plan : Mapped[str] = mapped_column(String(60),default="Free")
+    start_date: Mapped[datetime] = mapped_column(DateTime(),default=datetime.utcnow)
+    end_date: Mapped[datetime] = mapped_column(DateTime(),nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean(),default=False)
+    user: Mapped["User"] = relationship(back_populates="user_suscriptions")
+    suscription_payments: Mapped[List["Payment"]] = relationship(back_populates="suscription")
+
+class Payment(db.Model):
+    __tablename__:"payments"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"),nullable=False)
+    suscription_id : Mapped[int] = mapped_column(ForeignKey("suscriptions.id"),nullable=False)
+    amount: Mapped[int] = mapped_column(Numeric(10,2),nullable=False)
+    payment_date: Mapped[datetime] = mapped_column(DateTime(),nullable=False)
+    status: [payment_status] = mapped_column(Enum(payment_status),nullable=False)
+    method: [payment_methods] = mapped_column(Enum(payment_methods),nullable=False)
+    user: Mapped["User"] = relationship(back_populates="user_payments")
+    suscription: Mapped["Suscription"] = relationship(back_populates="suscription_payments")
+
+
 
