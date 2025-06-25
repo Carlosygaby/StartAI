@@ -1,4 +1,4 @@
-from main import db
+from app.models import db
 from sqlalchemy import String, Boolean, Integer, DateTime, ForeignKey, Enum, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List,Optional
@@ -57,7 +57,7 @@ class User(db.Model):
     user2_chat: Mapped[List["Chat"]] = relationship("Chat",foreign_keys="[Chat.user2]",back_populates="user2")
     user_sended_messages: Mapped[List["ChatMenssage"]] = relationship(back_populates="sender")
     user_comentaries: Mapped[List["Comentary"]] = relationship(back_populates="creator")
-    reactions: Mapped[List["Reaction"]] = relationship(back_populates="user")ç
+    reactions: Mapped[List["Reaction"]] = relationship(back_populates="user")
     user_favorites: Mapped[List["Favorite"]] = relationship(back_populates="user")
     user_ratings: Mapped[List["Rating"]] = relationship(back_populates="user")
     user_suscriptions: Mapped[List["Suscription"]] = relationship(back_populates="user")
@@ -78,9 +78,9 @@ class Product(db.Model):
     data_source: Mapped[List["ProductDataSource"]] = relationship(back_populates="product")
     product_comentaries: Mapped[List["Comentary"]] = relationship(back_populates="product")
     product_reactions: Mapped[List["Reaction"]] = relationship(back_populates="product")
-    product_images:[List["ProductImage"]] = relationship(back_populates="product")
-    product_favorites: [List["Favorite"]] = relationship(back_populates="product")
-    product_ratings: [List["Rating"]] = relationship(back_populates="product")
+    product_images:Mapped[List["ProductImage"]] = relationship(back_populates="product")
+    product_favorites: Mapped[List["Favorite"]] = relationship(back_populates="product")
+    product_ratings: Mapped[List["Rating"]] = relationship(back_populates="product")
 
 
 class MarketCategory(db.Model):
@@ -93,8 +93,8 @@ class MarketCategory(db.Model):
 class ProductCategory(db.Model):
     __tablename__:"product_categories"
     id: Mapped[int] = mapped_column(primary_key=True)
-    product_id: Mapped[int] = mapped_column(ForeignKey("product.id"),nullable=False)
-    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"),nullable=False)
+    category_id: Mapped[int] = mapped_column(ForeignKey("market_categories.id"),nullable=False)
 
 class TrendAnalysis(db.Model):
     __tablename__:"trend_analysis"
@@ -153,7 +153,7 @@ class Chat(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     user1_id : Mapped[int] = mapped_column(ForeignKey("users.id"),nullable=False)
     user2_id: Mapped[int] = mapped_column(ForeignKey("users.id"),nullable=False)
-    started_at: Mapped[datetime] = mapped_column(DateTime(),dafault=datetime.utcnow)
+    started_at: Mapped[datetime] = mapped_column(DateTime(),default=datetime.utcnow)
     user1: Mapped["User"] = relationship("User", foreign_keys= [user1_id],back_populates="user1_chat")
     user2: Mapped["User"] = relationship("User",foreign_keys= [user2_id], back_populates="user2_chat")
     messages: Mapped[List["ChatMenssage"]] = relationship(back_populates="chat")
@@ -162,7 +162,7 @@ class ChatMenssage(db.Model):
     __tablename__:"chat_menssages"
     id: Mapped[int] = mapped_column(primary_key=True)
     chat_id: Mapped[int] = mapped_column(ForeignKey("chats.id"),nullable=False)
-    sender_id: Mapped[int] = mapped_colunm(ForeignKey("users.id"),nullable=False)
+    sender_id: Mapped[int] = mapped_column(ForeignKey("users.id"),nullable=False)
     content: Mapped[str] = mapped_column(String(500),nullable=False)
     sented_at: Mapped[datetime] = mapped_column(DateTime(),default=datetime.utcnow)
     chat: Mapped["Chat"] = relationship(back_populates="messages")
@@ -174,7 +174,7 @@ class Comentary(db.Model):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"),nullable=False)
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id"),nullable=False)
     content: Mapped[str] = mapped_column(String(500),nullable=False)
-    created_at: Maapped[datetime] = mapped_column(DateTime(),default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime(),default=datetime.utcnow)
     creator: Mapped["User"] = relationship(back_populates="user_comentaries")
     product: Mapped["Product"] = relationship(back_populates="product_comentaries")
 
@@ -244,8 +244,8 @@ class Payment(db.Model):
     suscription_id : Mapped[int] = mapped_column(ForeignKey("suscriptions.id"),nullable=False)
     amount: Mapped[int] = mapped_column(Numeric(10,2),nullable=False)
     payment_date: Mapped[datetime] = mapped_column(DateTime(),nullable=False)
-    status: [payment_status] = mapped_column(Enum(payment_status),nullable=False)
-    method: [payment_methods] = mapped_column(Enum(payment_methods),nullable=False)
+    status: Mapped[payment_status] = mapped_column(Enum(payment_status),nullable=False)
+    method: Mapped[payment_methods] = mapped_column(Enum(payment_methods),nullable=False)
     user: Mapped["User"] = relationship(back_populates="user_payments")
     suscription: Mapped["Suscription"] = relationship(back_populates="suscription_payments")
 
