@@ -2,15 +2,14 @@ from flask import Flask
 from instance.config import Config
 from flask_sqlalchemy import SQLAlchemy
 from app.models import db
+from flask_migrate import Migrate
+
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     db.init_app(app)
-
-    with app.app_context():
-        from app.models.models import User,Product,MarketCategory,ProductCategory,DataSource,ProductDataSource,Survey,SurveyQuestion,SurveyAnswer,Chat,ChatMenssage,Comentary,Reaction,ProductImage,Favorite,Notification,Rating,Suscription,Payment
-        db.create_all()
+    migrate= Migrate(app,db,render_as_batch=False)
 
     return app
 
