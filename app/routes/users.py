@@ -16,9 +16,9 @@ def register():
     
     email = data["email"]
     password = data["password"]
-    user_role = data["user_role"]
+    user_type = data["user_type"]
 
-    if email.strip() == "" or password.strip() == "" or user_role.strip() == "":
+    if email.strip() == "" or password.strip() == "" or user_type.strip() == "":
         return jsonify({"msg": "Invalid credentials"}),400
     
     pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
@@ -34,5 +34,10 @@ def register():
     
     password_hashed = bcrypt.generated_password_hash(password).decode("utf-8")
 
-    new_user = User()
+    new_user = User(name=None,email = email, password = password_hashed, user_type= user_type,last_login_at = None, avatar_url = False, email_verified_at = None,bio = None)
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({"msg":"The user registered successfully"}),201
     
