@@ -23,13 +23,13 @@ class user_rol(enum.Enum):
 class User(db.Model):
     __tablename__="users"
     id: Mapped[int] = mapped_column(Integer(),primary_key=True)
-    name: Mapped[str] = mapped_column(String(120),nullable= False)
+    name: Mapped[Optional[str]] = mapped_column(String(120))
     email: Mapped[str] = mapped_column(String(120),nullable= False,unique=True)
     password: Mapped[str] = mapped_column(String(150),nullable= False)
     user_type: Mapped[user_rol] = mapped_column(Enum(user_rol),nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean(),default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(),default= datetime.utcnow)
-    last_login_at: Mapped[datetime] = mapped_column(DateTime(),nullable=False)
+    last_login_at: Mapped[Optional[datetime]] = mapped_column(DateTime())
     avatar_url: Mapped[Optional[str]] = mapped_column(String(120))
     email_verified_at: Mapped[Optional[datetime]] = mapped_column(DateTime())
     bio: Mapped[Optional[str]] = mapped_column(String(500))
