@@ -43,6 +43,3 @@ class Payment(db.Model):
     method: Mapped[payment_methods] = mapped_column(Enum(payment_methods),nullable=False)
     user: Mapped["User"] = relationship(back_populates="user_payments")
     suscription: Mapped["Suscription"] = relationship(back_populates="suscription_payments")
-
-
-
