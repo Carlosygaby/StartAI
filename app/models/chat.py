@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 if TYPE_CHECKING:
-    from .chat import Chat, ChatMenssage
+    from .chat import Chat, ChatMessage
     from .user import User
     
 
@@ -18,11 +18,11 @@ class Chat(db.Model):
     started_at: Mapped[datetime] = mapped_column(DateTime(),default=datetime.utcnow)
     user1: Mapped["User"] = relationship("User", foreign_keys= [user1_id],back_populates="user1_chat")
     user2: Mapped["User"] = relationship("User",foreign_keys= [user2_id], back_populates="user2_chat")
-    messages: Mapped[List["ChatMenssage"]] = relationship(back_populates="chat")
+    messages: Mapped[List["ChatMessage"]] = relationship(back_populates="chat")
 
 
-class ChatMenssage(db.Model):
-    __tablename__="chat_menssages"
+class ChatMessage(db.Model):
+    __tablename__="chat_messages"
     id: Mapped[int] = mapped_column(Integer(),primary_key=True)
     chat_id: Mapped[int] = mapped_column(Integer(),ForeignKey("chats.id",use_alter=True),nullable=False)
     sender_id: Mapped[int] = mapped_column(Integer(),ForeignKey("users.id",use_alter=True),nullable=False)
