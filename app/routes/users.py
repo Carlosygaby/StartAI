@@ -33,7 +33,7 @@ def register():
     if existing_user:
         return jsonify({"msg":"the user already exists"}),409
     
-    password_hashed = bcrypt.generated_password_hash(password).decode("utf-8")
+    password_hashed = bcrypt.generate_password_hash(password).decode("utf-8")
 
     new_user = User(name=None,email = email, password = password_hashed, user_type= user_type,last_login_at = None, avatar_url = False, email_verified_at = None,bio = None)
 

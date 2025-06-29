@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db= SQLAlchemy()
 
-from .chat import Chat, ChatMenssage
+from .chat import Chat, ChatMessage
 from .comentary import Comentary
 from .data_source import DataSource
 from .favorite import Favorite

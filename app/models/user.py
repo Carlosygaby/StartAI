@@ -8,7 +8,7 @@ import enum
 if TYPE_CHECKING:
     from .product import Product
     from .survey import Survey
-    from .chat import Chat, ChatMenssage
+    from .chat import Chat, ChatMessage
     from .comentary import Comentary
     from .reaction import Reaction
     from .favorite import Favorite
@@ -35,9 +35,9 @@ class User(db.Model):
     bio: Mapped[Optional[str]] = mapped_column(String(500))
     products: Mapped[List["Product"]] = relationship("Product",back_populates="owner")
     surveys: Mapped[List["Survey"]] = relationship("Survey",back_populates="creator")
-    user1_chat: Mapped[List["Chat"]] = relationship("Chat",foreign_keys="[Chat.user1]",back_populates="user1")
-    user2_chat: Mapped[List["Chat"]] = relationship("Chat",foreign_keys="[Chat.user2]",back_populates="user2")
-    user_sended_messages: Mapped[List["ChatMenssage"]] = relationship("ChatMessage",back_populates="sender")
+    user1_chat: Mapped[List["Chat"]] = relationship("Chat",foreign_keys="[Chat.user1_id]",back_populates="user1")
+    user2_chat: Mapped[List["Chat"]] = relationship("Chat",foreign_keys="[Chat.user2_id]",back_populates="user2")
+    user_sended_messages: Mapped[List["ChatMessage"]] = relationship("ChatMessage",back_populates="sender")
     user_comentaries: Mapped[List["Comentary"]] = relationship("Comentary",back_populates="creator")
     reactions: Mapped[List["Reaction"]] = relationship("Reaction",back_populates="user")
     user_favorites: Mapped[List["Favorite"]] = relationship("Favorite",back_populates="user")
