@@ -1,13 +1,14 @@
-from flask import request,jsonify
+from flask import request,jsonify,Blueprint
 from app.models import db
 from app.models.user import User
-from main import app
 import re
 from flask_bcrypt import Bcrypt
 
 bcrypt = Bcrypt()
 
-@app.route("/register",methods=["POST"])
+auth = Blueprint("auth",__name__)
+
+@auth.route("/register",methods=["POST"])
 def register():
     data = request.get_json()
 
@@ -18,8 +19,8 @@ def register():
     password = data["password"]
     user_type = data["user_type"]
 
-    if email.strip() == "" or password.strip() == "" or user_type.strip() == "":
-        return jsonify({"msg": "Invalid credentials"}),400
+    # if email.strip() == "" or password.strip() == "" or user_type.strip() == "":
+    #     return jsonify({"msg": "Invalid credentials"}),400
     
     pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
 

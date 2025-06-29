@@ -9,6 +9,9 @@ def create_app():
     app.config.from_object(Config)
     db.init_app(app)
     migrate= Migrate(app,db,render_as_batch=False)
+    from app.routes.users import auth
+    app.register_blueprint(auth)
+
     return app
 
 app = create_app()
