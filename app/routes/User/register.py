@@ -40,4 +40,5 @@ def register():
     db.session.commit()
 
     return jsonify({"msg":"The user registered successfully"}),201
+
     
